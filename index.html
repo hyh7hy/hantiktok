@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HantikNew - Coin Powered Social Boost Platform</title>
+  <style>
+    :root {
+      --bg: #080910;
+      --bg-soft: #0f1220;
+      --card: rgba(20, 24, 42, 0.62);
+      --card-border: rgba(255, 255, 255, 0.18);
+      --text: #eff3ff;
+      --muted: #acb6d9;
+      --neon-1: #00ffd0;
+      --neon-2: #00b7ff;
+      --neon-3: #d859ff;
+      --success: #26d97f;
+      --danger: #ff5571;
+      --warning: #f8be4b;
+      --shadow: 0 20px 40px rgba(1, 10, 28, 0.55);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(0, 255, 208, 0.12), transparent 30%),
+        radial-gradient(circle at 85% 0%, rgba(216, 89, 255, 0.15), transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(0, 183, 255, 0.11), transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 14px 90px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 10px;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      background: rgba(8, 11, 20, 0.72);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      background: linear-gradient(120deg, var(--neon-1), var(--neon-2), var(--neon-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .auth-state {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .coin-float {
+      position: fixed;
+      right: 16px;
+      bottom: 80px;
+      z-index: 20;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(6, 16, 34, 0.85);
+      box-shadow: var(--shadow);
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .coin-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd54f, #ffb300);
+      box-shadow: 0 0 12px rgba(255, 193, 7, 0.85);
+    }
+
+    .nav {
+      position: fixed;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      z-index: 25;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      background: rgba(6, 12, 22, 0.9);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      padding: 8px;
+    }
+
+    .nav button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      color: white;
+      background: linear-gradient(120deg, rgba(0, 255, 208, 0.2), rgba(0, 183, 255, 0.2));
+    }
+
+    .layout {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+    }
+
+    .panel {
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: none;
+      animation: rise 0.25s ease;
+    }
+
+    .panel.active { display: block; }
+
+    @keyframes rise {
+      from { opacity: 0.4; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .title {
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .feed {
+      display: grid;
+      gap: 14px;
+    }
+
+    .offer-card {
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 16px;
+      padding: 14px;
+      background: linear-gradient(145deg, rgba(16, 20, 36, 0.95), rgba(14, 16, 28, 0.78));
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .offer-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.42);
+    }
+
+    .offer-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .offer-content {
+      margin: 0 0 10px;
+      line-height: 1.4;
+      font-size: 0.95rem;
+    }
+
+    .offer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover { background: rgba(255, 255, 255, 0.13); }
+    .btn.primary {
+      border: none;
+      background: linear-gradient(120deg, var(--neon-1), var(--neon-2));
+      color: #021117;
+      font-weight: 700;
+    }
+    .btn.danger { border-color: rgba(255, 85, 113, 0.45); color: #ff92a4; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(0, 0, 0, 0.25);
+      color: #fff;
+      padding: 10px 11px;
+      border-radius: 11px;
+      outline: none;
+    }
+
+    .field textarea { min-height: 96px; resize: vertical; }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .stat strong { display: block; font-size: 1rem; }
+    .stat span { color: var(--muted); font-size: 0.75rem; }
+
+    .status {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+    }
+    .status.success { color: var(--success); }
+    .status.error { color: var(--danger); }
+
+    .pill {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (min-width: 760px) {
+      .layout {
+        grid-template-columns: 2fr 1fr;
+        align-items: start;
+      }
+      .panel.span-2 { grid-column: span 2; }
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+      .nav {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 700px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <div class="brand">HantikNew</div>
+        <small class="pill">100 coins = 25 ETB</small>
+      </div>
+      <div class="auth-state" id="authState">Not logged in</div>
+    </header>
+
+    <main class="layout">
+      <!-- Home / TikTok-style feed section -->
+      <section class="panel span-2 active" id="homePanel" data-panel="home">
+        <h2 class="title">Home Feed</h2>
+        <p class="subtitle">Complete actions and earn coins instantly (real-time synced).</p>
+        <div class="stats">
+          <div class="stat"><strong id="offerCount">0</strong><span>Offers</span></div>
+          <div class="stat"><strong id="likeDoneCount">0</strong><span>Likes Done</span></div>
+          <div class="stat"><strong id="viewDoneCount">0</strong><span>Views Done</span></div>
+        </div>
+        <div class="feed" id="feed"></div>
+      </section>
+
+      <!-- Signup section -->
+      <section class="panel" id="signupPanel" data-panel="signup">
+        <h2 class="title">Signup</h2>
+        <p class="subtitle">Create your account and start earning coins.</p>
+        <form id="signupForm">
+          <div class="grid-2">
+            <div class="field">
+              <label for="signupUsername">Username</label>
+              <input id="signupUsername" required />
+            </div>
+            <div class="field">
+              <label for="signupEmail">Email</label>
+              <input id="signupEmail" type="email" required />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="signupPassword">Password</label>
+              <input id="signupPassword" type="password" minlength="6" required />
+            </div>
+            <div class="field">
+              <label for="signupConfirm">Confirm Password</label>
+              <input id="signupConfirm" type="password" minlength="6" required />
+            </div>
+          </div>
+          <button class="btn primary" type="submit">Create Account</button>
+        </form>
+        <div id="signupStatus" class="status"></div>
+      </section>
+
+      <!-- Login section -->
+      <section class="panel" id="loginPanel" data-panel="login">
+        <h2 class="title">Login</h2>
+        <p class="subtitle">Sign in to manage offers, coins, and interactions.</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" required />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" minlength="6" required />
+          </div>
+          <button class="btn primary" type="submit">Login</button>
+          <button class="btn danger" type="button" id="logoutBtn">Logout</button>
+        </form>
+        <div id="loginStatus" class="status"></div>
+      </section>
+
+      <!-- Shop / Buy coins section -->
+      <section class="panel" id="shopPanel" data-panel="shop">
+        <h2 class="title">Buy Coins</h2>
+        <p class="subtitle">Buy coins and submit your payment proof for approval.</p>
+        <form id="paymentForm">
+          <div class="grid-2">
+            <div class="field">
+              <label for="coinAmount">Coin Amount</label>
+              <input id="coinAmount" type="number" min="100" step="100" value="100" required />
+            </div>
+            <div class="field">
+              <label for="paymentMethod">Payment Method</label>
+              <select id="paymentMethod" required>
+                <option value="Telebirr">Telebirr (0996350347 - Hanif)</option>
+                <option value="CBE">CBE (1000081905847 - Mekdes)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="proofFile">Upload Screenshot Proof</label>
+            <input id="proofFile" type="file" accept="image/*" required />
+          </div>
+          <button class="btn primary" type="submit">Submit Payment Request</button>
+        </form>
+        <p class="hint">
+          Pricing: <strong>100 coins = 25 ETB</strong>.<br />
+          Telebirr: <strong>0996350347 (Hanif)</strong> | CBE: <strong>1000081905847 (Mekdes)</strong>.<br />
+          Send payment proof via Telegram: <strong>@hanif</strong>.
+        </p>
+        <div id="paymentStatus" class="status"></div>
+      </section>
+
+      <!-- My offers section -->
+      <section class="panel" id="myOffersPanel" data-panel="offers">
+        <h2 class="title">My Offers</h2>
+        <p class="subtitle">Track your posted campaigns and spent coins.</p>
+        <div id="myOffersList"></div>
+      </section>
+
+      <!-- Post offer section -->
+      <section class="panel" id="postPanel" data-panel="post">
+        <h2 class="title">Post Offer</h2>
+        <p class="subtitle">Spend coins to get likes. 100 coins gives up to 50 likes.</p>
+        <form id="postOfferForm">
+          <div class="field">
+            <label for="offerContent">Offer Description</label>
+            <textarea id="offerContent" placeholder="Describe what users should do..." required></textarea>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="offerUrl">Target URL</label>
+              <input id="offerUrl" type="url" placeholder="https://..." required />
+            </div>
+            <div class="field">
+              <label for="likesTarget">Likes Target</label>
+              <input id="likesTarget" type="number" min="1" max="500" value="50" required />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="scheduleTime">Schedule Time</label>
+              <input id="scheduleTime" type="datetime-local" required />
+            </div>
+            <div class="field">
+              <label for="actionType">Action Type</label>
+              <select id="actionType">
+                <option value="like">Like</option>
+                <option value="comment">Comment</option>
+                <option value="follow">Follow</option>
+                <option value="share">Share</option>
+                <option value="view">View</option>
+                <option value="favorite">Favorite</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn primary" type="submit">Publish Offer</button>
+        </form>
+        <div id="postStatus" class="status"></div>
+      </section>
+
+      <!-- Contact section -->
+      <section class="panel" id="contactPanel" data-panel="contact">
+        <h2 class="title">Contact</h2>
+        <p class="subtitle">Need support? Send your message and our team will reply.</p>
+        <form id="contactForm">
+          <div class="grid-2">
+            <div class="field">
+              <label for="contactName">Name</label>
+              <input id="contactName" required />
+            </div>
+            <div class="field">
+              <label for="contactEmail">Email</label>
+              <input id="contactEmail" type="email" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="contactMessage">Message</label>
+            <textarea id="contactMessage" required></textarea>
+          </div>
+          <button class="btn primary" type="submit">Send Message</button>
+        </form>
+        <p class="hint">Phone: +251996350347 · Email: haanifawol@gmail.com</p>
+        <div id="contactStatus" class="status"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="coin-float"><span class="coin-dot"></span> Coins: <span id="coinCount">0</span></div>
+
+  <!-- Bottom navigation for smooth in-page section switches -->
+  <nav class="nav" id="bottomNav">
+    <button class="active" data-target="home">Home</button>
+    <button data-target="signup">Signup</button>
+    <button data-target="login">Login</button>
+    <button data-target="shop">Shop</button>
+    <button data-target="offers">My Offers</button>
+    <button data-target="post">Post Offer</button>
+    <button data-target="contact">Contact</button>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ------------------------------
+    // Supabase configuration
+    // ------------------------------
+    const SUPABASE_URL = "https://wddzivtvwnigknbzubek.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_yGJ8D1q3YMP36HbrQ4eE2Q_vZ48jVsr";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Coin reward mapping per action
+    const COIN_REWARDS = {
+      like: 2,
+      comment: 3,
+      follow: 4,
+      share: 3,
+      view: 1,
+      favorite: 3,
+    };
+
+    const PANELS = document.querySelectorAll(".panel");
+    const NAV_BTNS = document.querySelectorAll(".nav button");
+
+    const state = {
+      user: null,
+      profile: null,
+      offers: [],
+      myOffers: [],
+      channels: [],
+    };
+
+    // ------------------------------
+    // Navigation helpers
+    // ------------------------------
+    function switchPanel(panelName) {
+      PANELS.forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === panelName));
+      NAV_BTNS.forEach((btn) => btn.classList.toggle("active", btn.dataset.target === panelName));
+    }
+
+    NAV_BTNS.forEach((btn) => {
+      btn.addEventListener("click", () => switchPanel(btn.dataset.target));
+    });
+
+    function setStatus(id, message, type = "") {
+      const el = document.getElementById(id);
+      el.textContent = message;
+      el.className = `status ${type}`.trim();
+    }
+
+    function setCoinDisplay() {
+      document.getElementById("coinCount").textContent = state.profile?.coin_balance ?? 0;
+      document.getElementById("authState").textContent = state.user
+        ? `${state.profile?.username || state.user.email} (${state.user.email})`
+        : "Not logged in";
+    }
+
+    // ------------------------------
+    // Data fetching and rendering
+    // ------------------------------
+    async function loadProfile() {
+      if (!state.user) {
+        state.profile = null;
+        setCoinDisplay();
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, username, email, coin_balance")
+        .eq("id", state.user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Profile load error", error);
+        return;
+      }
+
+      if (data) {
+        state.profile = data;
+      } else {
+        const fallbackUsername = state.user.email?.split("@")[0] || "user";
+        const { data: inserted, error: insertError } = await supabase
+          .from("users")
+          .insert({ id: state.user.id, username: fallbackUsername, email: state.user.email, coin_balance: 0 })
+          .select("id, username, email, coin_balance")
+          .single();
+
+        if (insertError) {
+          console.error("Profile create error", insertError);
+        } else {
+          state.profile = inserted;
+        }
+      }
+
+      setCoinDisplay();
+    }
+
+    async function loadOffers() {
+      const { data, error } = await supabase
+        .from("offers")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      if (error) {
+        console.error("Offer fetch error", error);
+        return;
+      }
+
+      state.offers = data || [];
+      renderFeed();
+      renderStats();
+      renderMyOffers();
+    }
+
+    function renderStats() {
+      const likes = state.offers.reduce((acc, o) => acc + (o.likes_done || 0), 0);
+      const views = state.offers.reduce((acc, o) => acc + (o.views_done || 0), 0);
+      document.getElementById("offerCount").textContent = state.offers.length;
+      document.getElementById("likeDoneCount").textContent = likes;
+      document.getElementById("viewDoneCount").textContent = views;
+    }
+
+    function renderFeed() {
+      const feed = document.getElementById("feed");
+      feed.innerHTML = "";
+
+      if (!state.offers.length) {
+        feed.innerHTML = `<div class="offer-card">No offers yet. Be the first to post one.</div>`;
+        return;
+      }
+
+      for (const offer of state.offers) {
+        const card = document.createElement("article");
+        card.className = "offer-card";
+        card.innerHTML = `
+          <div class="offer-head">
+            <span>@${offer.username || "creator"}</span>
+            <span>${new Date(offer.created_at || Date.now()).toLocaleString()}</span>
+          </div>
+          <p class="offer-content">${escapeHtml(offer.content || "")}</p>
+          <div class="hint">Action: <strong>${(offer.action_type || "like").toUpperCase()}</strong> · Reward: <strong>${COIN_REWARDS[offer.action_type || "like"] || 0} coins</strong></div>
+          <p class="hint">Target URL: <a href="${escapeHtml(offer.target_url || "#")}" target="_blank" rel="noopener">${escapeHtml(offer.target_url || "Open link")}</a></p>
+          <div class="offer-actions">
+            <button class="btn" data-action="like" data-id="${offer.id}">👍 Like (${offer.likes_done || 0})</button>
+            <button class="btn" data-action="comment" data-id="${offer.id}">💬 Comment (${offer.comments_done || 0})</button>
+            <button class="btn" data-action="follow" data-id="${offer.id}">➕ Follow</button>
+            <button class="btn" data-action="share" data-id="${offer.id}">🔁 Share (${offer.shares_done || 0})</button>
+            <button class="btn" data-action="view" data-id="${offer.id}">👁 View (${offer.views_done || 0})</button>
+            <button class="btn" data-action="favorite" data-id="${offer.id}">⭐ Favorite (${offer.favorites_done || 0})</button>
+          </div>
+        `;
+        feed.appendChild(card);
+      }
+    }
+
+    function renderMyOffers() {
+      const wrapper = document.getElementById("myOffersList");
+      if (!state.user) {
+        wrapper.innerHTML = `<div class="offer-card">Login to view your offers.</div>`;
+        return;
+      }
+
+      const mine = state.offers.filter((o) => o.user_id === state.user.id);
+      state.myOffers = mine;
+
+      if (!mine.length) {
+        wrapper.innerHTML = `<div class="offer-card">No posted offers yet.</div>`;
+        return;
+      }
+
+      wrapper.innerHTML = mine.map((o) => `
+        <div class="offer-card">
+          <div class="offer-head"><span>${(o.action_type || "like").toUpperCase()}</span><span>Spent: ${o.coins_spent || 0} coins</span></div>
+          <p class="offer-content">${escapeHtml(o.content || "")}</p>
+          <div class="hint">Likes ${o.likes_done || 0}/${o.likes_target || 0} · Comments ${o.comments_done || 0} · Shares ${o.shares_done || 0} · Views ${o.views_done || 0}</div>
+          <div class="hint">Scheduled: ${o.schedule_time ? new Date(o.schedule_time).toLocaleString() : "Not set"}</div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    // ------------------------------
+    // Auth handlers
+    // ------------------------------
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("signupUsername").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const confirm = document.getElementById("signupConfirm").value;
+
+      if (password !== confirm) {
+        setStatus("signupStatus", "Passwords do not match.", "error");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setStatus("signupStatus", error.message, "error");
+        return;
+      }
+
+      if (data.user) {
+        await supabase.from("users").upsert({
+          id: data.user.id,
+          username,
+          email,
+          coin_balance: 0,
+        });
+      }
+
+      setStatus("signupStatus", "Signup successful. Check your email if confirmation is enabled.", "success");
+      switchPanel("login");
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setStatus("loginStatus", error.message, "error");
+        return;
+      }
+
+      state.user = data.user;
+      await loadProfile();
+      setStatus("loginStatus", "Login successful.", "success");
+      renderMyOffers();
+      setupRealtime();
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      state.user = null;
+      state.profile = null;
+      teardownRealtime();
+      setCoinDisplay();
+      setStatus("loginStatus", "Logged out.", "success");
+      renderMyOffers();
+    });
+
+    // ------------------------------
+    // Offer interactions and posting
+    // ------------------------------
+    document.getElementById("feed").addEventListener("click", async (e) => {
+      const btn = e.target.closest("button[data-id][data-action]");
+      if (!btn) return;
+      if (!state.user || !state.profile) {
+        alert("Login first to complete offers and earn coins.");
+        switchPanel("login");
+        return;
+      }
+
+      const offerId = btn.dataset.id;
+      const action = btn.dataset.action;
+      const reward = COIN_REWARDS[action] || 0;
+      const offer = state.offers.find((o) => String(o.id) === String(offerId));
+      if (!offer) return;
+
+      const updateField = {
+        like: "likes_done",
+        comment: "comments_done",
+        follow: "follows_done",
+        share: "shares_done",
+        view: "views_done",
+        favorite: "favorites_done",
+      }[action];
+
+      const currentValue = Number(offer[updateField] || 0);
+      const { error: offerError } = await supabase
+        .from("offers")
+        .update({ [updateField]: currentValue + 1 })
+        .eq("id", offerId);
+
+      if (offerError) {
+        alert("Could not record action: " + offerError.message);
+        return;
+      }
+
+      const newBalance = Number(state.profile.coin_balance || 0) + reward;
+      const { error: coinError } = await supabase
+        .from("users")
+        .update({ coin_balance: newBalance })
+        .eq("id", state.user.id);
+
+      if (coinError) {
+        alert("Action recorded, but coin update failed: " + coinError.message);
+      } else {
+        state.profile.coin_balance = newBalance;
+        setCoinDisplay();
+      }
+
+      loadOffers();
+    });
+
+    document.getElementById("postOfferForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!state.user || !state.profile) {
+        setStatus("postStatus", "Login first.", "error");
+        switchPanel("login");
+        return;
+      }
+
+      const content = document.getElementById("offerContent").value.trim();
+      const target_url = document.getElementById("offerUrl").value.trim();
+      const likes_target = Number(document.getElementById("likesTarget").value);
+      const schedule_time = document.getElementById("scheduleTime").value;
+      const action_type = document.getElementById("actionType").value;
+
+      const blocks = Math.ceil(likes_target / 50);
+      const coins_spent = blocks * 100;
+
+      if ((state.profile.coin_balance || 0) < coins_spent) {
+        setStatus("postStatus", `Insufficient coins. You need ${coins_spent} coins.`, "error");
+        return;
+      }
+
+      const payload = {
+        user_id: state.user.id,
+        username: state.profile.username,
+        content,
+        target_url,
+        action_type,
+        likes_target,
+        likes_done: 0,
+        comments_done: 0,
+        shares_done: 0,
+        views_done: 0,
+        favorites_done: 0,
+        coins_spent,
+        schedule_time,
+      };
+
+      const { error } = await supabase.from("offers").insert(payload);
+      if (error) {
+        setStatus("postStatus", error.message, "error");
+        return;
+      }
+
+      const updatedCoins = state.profile.coin_balance - coins_spent;
+      await supabase.from("users").update({ coin_balance: updatedCoins }).eq("id", state.user.id);
+      state.profile.coin_balance = updatedCoins;
+      setCoinDisplay();
+
+      e.target.reset();
+      setStatus("postStatus", "Offer posted successfully.", "success");
+      loadOffers();
+      switchPanel("offers");
+    });
+
+    // ------------------------------
+    // Payments / shop
+    // ------------------------------
+    document.getElementById("paymentForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!state.user) {
+        setStatus("paymentStatus", "Please login before submitting payment.", "error");
+        switchPanel("login");
+        return;
+      }
+
+      const coins = Number(document.getElementById("coinAmount").value);
+      const payment_method = document.getElementById("paymentMethod").value;
+      const proofFile = document.getElementById("proofFile").files[0];
+
+      if (!proofFile) {
+        setStatus("paymentStatus", "Please upload your screenshot proof.", "error");
+        return;
+      }
+
+      const amount_etb = (coins / 100) * 25;
+      const proof_url = await fileToDataUrl(proofFile);
+
+      const { error } = await supabase.from("payments").insert({
+        user_id: state.user.id,
+        coins,
+        amount_etb,
+        payment_method,
+        proof_url,
+        status: "pending",
+      });
+
+      if (error) {
+        setStatus("paymentStatus", error.message, "error");
+        return;
+      }
+
+      setStatus("paymentStatus", "Payment request submitted. Also send proof to Telegram @hanif.", "success");
+      e.target.reset();
+    });
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ------------------------------
+    // Contact form
+    // ------------------------------
+    document.getElementById("contactForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("contactName").value.trim();
+      const email = document.getElementById("contactEmail").value.trim();
+      const message = document.getElementById("contactMessage").value.trim();
+
+      const { error } = await supabase.from("contacts").insert({
+        user_id: state.user?.id || null,
+        name,
+        email,
+        message,
+      });
+
+      if (error) {
+        setStatus("contactStatus", error.message, "error");
+        return;
+      }
+
+      e.target.reset();
+      setStatus("contactStatus", "Message sent successfully.", "success");
+    });
+
+    // ------------------------------
+    // Realtime subscriptions
+    // ------------------------------
+    function teardownRealtime() {
+      state.channels.forEach((ch) => supabase.removeChannel(ch));
+      state.channels = [];
+    }
+
+    function setupRealtime() {
+      teardownRealtime();
+
+      const offersChannel = supabase
+        .channel("offers-live")
+        .on("postgres_changes", { event: "*", schema: "public", table: "offers" }, async () => {
+          await loadOffers();
+        })
+        .subscribe();
+
+      const usersChannel = supabase
+        .channel("users-live")
+        .on("postgres_changes", { event: "*", schema: "public", table: "users" }, async (payload) => {
+          if (state.user && payload.new?.id === state.user.id) {
+            await loadProfile();
+          }
+        })
+        .subscribe();
+
+      const paymentsChannel = supabase
+        .channel("payments-live")
+        .on("postgres_changes", { event: "*", schema: "public", table: "payments" }, () => {
+          // Reserved for future payment status notifications
+        })
+        .subscribe();
+
+      state.channels.push(offersChannel, usersChannel, paymentsChannel);
+    }
+
+    // ------------------------------
+    // Initial app bootstrap
+    // ------------------------------
+    async function init() {
+      const { data: authData } = await supabase.auth.getUser();
+      state.user = authData.user || null;
+      await loadProfile();
+      await loadOffers();
+      setupRealtime();
+    }
+
+    init();
+  </script>
+</body>
+</html>
